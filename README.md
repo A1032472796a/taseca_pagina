@@ -1,1 +1,0 @@
-# taseca_pagina
