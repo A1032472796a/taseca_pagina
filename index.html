@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Taseca — Automatización, analítica predictiva y software SaaS. Conoce Taseca Citas: el sistema de agendamiento para barberías, salones y spas que elimina el desorden, reduce cancelaciones y recupera clientes." />
+<title>Taseca — Automatización & Analítica · Taseca Citas SaaS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05070f; --bg-2: #0a0e1a; --surface: #0f1424; --surface-2: #131a2e;
+    --primary: #d4a437; --primary-soft: #f5d97f; --cyan: #00e5ff; --cyan-soft: #6ee8ff;
+    --accent: #6ec5ff; --text: #e8ecf5; --muted: #8a93a8;
+    --border: rgba(0, 229, 255, 0.18); --border-gold: rgba(212, 164, 55, 0.22);
+    --danger: #ff6b6b; --success: #28c840;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; position: relative; }
+
+  .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px); background-size: 50px 50px; z-index: 0; pointer-events: none; mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%); }
+  .bg-glow { position: fixed; top: -10%; left: 50%; transform: translateX(-50%); width: 1200px; height: 1200px; background: radial-gradient(circle, rgba(0, 229, 255, 0.06) 0%, rgba(212, 164, 55, 0.04) 30%, transparent 65%); pointer-events: none; z-index: 0; animation: pulse-glow 8s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+  #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  body::after { content: ''; position: fixed; inset: 0; background: linear-gradient(transparent 0%, rgba(0, 229, 255, 0.02) 50%, transparent 100%); background-size: 100% 4px; pointer-events: none; z-index: 1; opacity: 0.5; mix-blend-mode: overlay; }
+
+  /* === PÁGINAS (cada sección es una página separada) === */
+  /* Paginación con CSS puro (sin depender de JavaScript) */
+  .page { min-height: calc(100vh - 70px); scroll-margin-top: 72px; display: none; }
+  #inicio { display: block; }
+  .page:target { display: block; animation: pageIn 0.45s ease; }
+  body:has(.page:not(#inicio):target) #inicio { display: none; }
+  @keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .reveal { opacity: 1; transform: none; }
+
+  /* === Navigation === */
+  nav { position: fixed; top: 0; left: 0; right: 0; padding: 16px 6%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 7, 15, 0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); z-index: 100; }
+  .brand { display: flex; align-items: center; gap: 12px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.3rem; letter-spacing: 4px; color: var(--text); text-decoration: none; cursor: pointer; }
+  .brand svg { width: 38px; height: 38px; filter: drop-shadow(0 0 8px rgba(212, 164, 55, 0.6)); }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; transition: color 0.2s, text-shadow 0.2s; position: relative; cursor: pointer; }
+  .nav-links a::before { content: '> '; opacity: 0; transition: opacity 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--cyan); text-shadow: 0 0 8px rgba(0, 229, 255, 0.6); }
+  .nav-links a:hover::before, .nav-links a.active::before { opacity: 1; }
+  .cta { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: #05070f; padding: 10px 22px; border-radius: 4px; font-weight: 700; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(245, 217, 127, 0.5); position: relative; overflow: hidden; cursor: pointer; }
+  .cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent); transform: translateX(-100%); transition: transform 0.6s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212, 164, 55, 0.5), 0 0 30px rgba(212, 164, 55, 0.3); }
+  .cta:hover::before { transform: translateX(100%); }
+  .nav-toggle { display: none; background: none; border: none; color: var(--cyan); cursor: pointer; }
+
+  /* === Hero === */
+  .hero { min-height: calc(100vh - 70px); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 110px 6% 60px; position: relative; z-index: 2; }
+  .hero-tag { font-family: 'JetBrains Mono', monospace; color: var(--cyan); font-size: 0.8rem; letter-spacing: 3px; margin-bottom: 24px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; background: rgba(0, 229, 255, 0.05); display: inline-flex; align-items: center; gap: 8px; }
+  .hero-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .hero-logo-wrap { position: relative; width: 190px; height: 190px; margin-bottom: 28px; }
+  .hero-logo { width: 100%; height: 100%; animation: float 6s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(212, 164, 55, 0.4)); }
+  .ring { position: absolute; inset: 0; border: 1px dashed rgba(0, 229, 255, 0.3); border-radius: 50%; animation: rotate 20s linear infinite; }
+  .ring-2 { inset: -20px; border-color: rgba(212, 164, 55, 0.2); border-style: dotted; animation: rotate 30s linear infinite reverse; }
+  .ring::before, .ring::after { content: ''; position: absolute; width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 8px var(--cyan); }
+  .ring::before { top: -3px; left: 50%; transform: translateX(-50%); }
+  .ring::after { bottom: -3px; left: 50%; transform: translateX(-50%); background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+  @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .eye-pupil { animation: scan 4s ease-in-out infinite; transform-origin: center; }
+  @keyframes scan { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(3px); } 75% { transform: translateX(-3px); } }
+  .hero h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(2.2rem, 6vw, 4.4rem); font-weight: 900; letter-spacing: 4px; margin-bottom: 18px; background: linear-gradient(135deg, #f5d97f 0%, #d4a437 30%, #00e5ff 70%, #6ee8ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 0 40px rgba(212, 164, 55, 0.3); line-height: 1.1; max-width: 1000px; }
+  .hero .tagline { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: clamp(0.85rem, 1.5vw, 1rem); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 28px; }
+  .hero .tagline .bracket { color: var(--cyan); }
+  .hero p.lead { max-width: 700px; font-size: 1.15rem; color: var(--text); margin-bottom: 36px; opacity: 0.92; }
+  .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn-secondary { background: transparent; color: var(--cyan); padding: 13px 26px; border: 1px solid var(--cyan); border-radius: 4px; text-decoration: none; font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; letter-spacing: 1px; transition: all 0.3s; position: relative; overflow: hidden; cursor: pointer; }
+  .btn-secondary:hover { background: rgba(0, 229, 255, 0.1); box-shadow: 0 0 20px rgba(0, 229, 255, 0.4), inset 0 0 20px rgba(0, 229, 255, 0.1); }
+  .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: #05070f; padding: 14px 30px; border-radius: 4px; text-decoration: none; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; letter-spacing: 1px; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(245, 217, 127, 0.5); cursor: pointer; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212, 164, 55, 0.5), 0 0 30px rgba(212, 164, 55, 0.3); }
+  .hero-ticker { margin-top: 50px; display: flex; gap: 40px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); flex-wrap: wrap; justify-content: center; }
+  .hero-ticker span { color: var(--cyan); }
+
+  /* === Section base === */
+  section { padding: 100px 6%; position: relative; z-index: 2; }
+  .page-head { text-align: center; padding-top: 110px; }
+  .section-title { text-align: center; margin-bottom: 50px; }
+  .section-title .eyebrow { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 10px; }
+  .section-title .eyebrow::before, .section-title .eyebrow::after { content: ''; width: 30px; height: 1px; background: var(--cyan); }
+  .section-title h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 700; margin-bottom: 16px; letter-spacing: 2px; }
+  .section-title p { color: var(--muted); max-width: 660px; margin: 0 auto; }
+
+  /* === Value Props === */
+  .value-props { padding: 20px 6% 90px; }
+  .value-props-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .value-card { background: linear-gradient(135deg, rgba(15, 20, 36, 0.9), rgba(19, 26, 46, 0.6)); border: 1px solid var(--border-gold); border-radius: 10px; padding: 28px 24px; position: relative; overflow: hidden; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; }
+  .value-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--primary), var(--cyan), transparent); opacity: 0.8; }
+  .value-card::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(0, 229, 255, 0.08), transparent 60%); pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+  .value-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(212, 164, 55, 0.15), 0 0 0 1px rgba(212, 164, 55, 0.3); }
+  .value-card:hover::after { opacity: 1; }
+  .value-check { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: #05070f; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-weight: 800; box-shadow: 0 0 16px rgba(212, 164, 55, 0.4); }
+  .value-card h3 { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; font-weight: 700; line-height: 1.4; letter-spacing: 0.5px; color: var(--text); }
+  .value-card h3 .highlight { background: linear-gradient(135deg, var(--primary-soft), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* === Product === */
+  .product-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 2px; color: var(--primary-soft); padding: 6px 14px; border: 1px solid var(--border-gold); border-radius: 20px; background: rgba(212, 164, 55, 0.06); margin-bottom: 20px; }
+  .product-hero { max-width: 1150px; margin: 0 auto 70px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 50px; align-items: center; }
+  .product-hero h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); letter-spacing: 1px; margin-bottom: 18px; line-height: 1.2; }
+  .product-hero h2 .grad { background: linear-gradient(135deg, var(--primary-soft), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .product-hero p.intro { color: var(--muted); font-size: 1.05rem; margin-bottom: 26px; }
+  .product-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .audience-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; }
+  .audience-chip { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; color: var(--cyan); padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: rgba(0,229,255,0.04); }
+  .video-demo { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,229,255,0.08); background: #020308; }
+  .video-demo::before, .video-demo::after { content: ''; position: absolute; width: 20px; height: 20px; border: 2px solid var(--cyan); z-index: 4; pointer-events: none; opacity: 0.8; }
+  .video-demo::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .video-demo::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+  .video-demo video, .video-demo iframe { width: 100%; display: block; aspect-ratio: 16 / 9; border: 0; object-fit: cover; background: #020308; }
+  .video-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: radial-gradient(circle at center, rgba(5,7,15,0.35), rgba(5,7,15,0.78)); cursor: pointer; transition: opacity 0.4s; z-index: 3; }
+  .video-overlay.hidden { opacity: 0; pointer-events: none; }
+  .play-btn { width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-soft)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(212,164,55,0.5); transition: transform 0.25s; }
+  .video-overlay:hover .play-btn { transform: scale(1.08); }
+  .play-btn svg { width: 30px; height: 30px; color: #05070f; margin-left: 4px; }
+  .video-label { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; letter-spacing: 2px; color: var(--text); }
+  .play-pulse { position: absolute; width: 76px; height: 76px; border-radius: 50%; border: 2px solid var(--primary); animation: pulse-ring 2.4s ease-out infinite; }
+  @keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.9); opacity: 0; } }
+  .pb-grid { max-width: 1150px; margin: 0 auto 70px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .pb-col { border-radius: 12px; padding: 32px 28px; border: 1px solid var(--border); background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); }
+  .pb-col.problems { border-color: rgba(255,107,107,0.25); }
+  .pb-col.benefits { border-color: var(--border-gold); }
+  .pb-col h3 { font-family: 'Orbitron', sans-serif; font-size: 1.15rem; letter-spacing: 1px; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
+  .pb-col.problems h3 { color: #ffb4b4; }
+  .pb-col.benefits h3 { color: var(--primary-soft); }
+  .pb-item { display: flex; gap: 14px; margin-bottom: 18px; align-items: flex-start; }
+  .pb-item:last-child { margin-bottom: 0; }
+  .pb-ico { flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+  .pb-col.problems .pb-ico { background: rgba(255,107,107,0.12); color: #ff8f8f; border: 1px solid rgba(255,107,107,0.3); }
+  .pb-col.benefits .pb-ico { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: #05070f; box-shadow: 0 0 14px rgba(212,164,55,0.35); }
+  .pb-item h4 { font-size: 0.98rem; margin-bottom: 4px; font-weight: 600; }
+  .pb-item p { color: var(--muted); font-size: 0.88rem; }
+
+  /* === Services === */
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+  .service-card { background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 8px; padding: 32px 28px; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; }
+  .service-card::before, .service-card::after { content: ''; position: absolute; width: 14px; height: 14px; border: 1px solid var(--cyan); opacity: 0.6; transition: opacity 0.3s, width 0.3s, height 0.3s; }
+  .service-card::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+  .service-card::after { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+  .service-card:hover { transform: translateY(-6px); border-color: var(--cyan); box-shadow: 0 10px 40px rgba(0, 229, 255, 0.15), 0 0 0 1px rgba(0, 229, 255, 0.3); }
+  .service-card:hover::before, .service-card:hover::after { opacity: 1; width: 20px; height: 20px; }
+  .service-card .card-id { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 18px; display: block; }
+  .service-icon { width: 54px; height: 54px; background: linear-gradient(135deg, rgba(0, 229, 255, 0.12), rgba(212, 164, 55, 0.08)); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--cyan); box-shadow: 0 0 20px rgba(0, 229, 255, 0.1); }
+  .service-card h3 { font-size: 1.2rem; margin-bottom: 12px; font-weight: 600; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
+  .service-card p { color: var(--muted); font-size: 0.92rem; }
+
+  /* === Process === */
+  .process-list { max-width: 900px; margin: 80px auto 0; display: grid; gap: 18px; }
+  .process-item { display: grid; grid-template-columns: 90px 1fr auto; gap: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px; align-items: center; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
+  .process-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--cyan), transparent); }
+  .process-item:hover { border-color: var(--cyan); transform: translateX(6px); }
+  .process-num { font-family: 'Orbitron', sans-serif; font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .process-item h4 { font-size: 1.1rem; margin-bottom: 6px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
+  .process-item p { color: var(--muted); font-size: 0.92rem; }
+  .process-status { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--cyan); padding: 4px 10px; border: 1px solid var(--cyan); border-radius: 12px; background: rgba(0, 229, 255, 0.05); }
+
+  /* === About === */
+  .about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; max-width: 1100px; margin: 0 auto; align-items: center; }
+  .about-text .eyebrow { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 12px; }
+  .about-text h2 { font-family: 'Orbitron', sans-serif; font-size: 2.1rem; margin-bottom: 22px; letter-spacing: 1px; line-height: 1.25; }
+  .about-text p { color: var(--muted); margin-bottom: 18px; }
+  .about-text p strong { color: var(--primary-soft); font-weight: 600; }
+  .founders { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+  .founder { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; transition: border-color 0.3s, transform 0.3s; }
+  .founder:hover { border-color: var(--cyan); transform: translateY(-3px); }
+  .founder-avatar { width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.8rem; color: #05070f; background: linear-gradient(135deg, var(--primary), var(--cyan)); box-shadow: 0 0 18px rgba(0,229,255,0.3); overflow: hidden; border: 2px solid var(--border); }
+  .founder-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .founder h4 { font-size: 1rem; margin-bottom: 4px; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; }
+  .founder span { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan); letter-spacing: 1px; }
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 28px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px; position: relative; }
+  .stat-box::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--cyan), var(--primary)); border-radius: 6px 0 0 6px; }
+  .stat-num { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-label { color: var(--muted); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; }
+  .about-visual { display: flex; justify-content: center; align-items: center; position: relative; }
+  .about-visual svg.logo-large { width: 100%; max-width: 360px; filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.25)); }
+  .hud-frame { position: relative; padding: 30px; }
+  .hud-frame::before, .hud-frame::after, .hud-frame > .corner { content: ''; position: absolute; width: 30px; height: 30px; border: 2px solid var(--cyan); }
+  .hud-frame::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+  .hud-frame::after { top: 0; right: 0; border-left: none; border-bottom: none; }
+  .hud-frame .corner.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+  .hud-frame .corner.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+  /* === Blog === */
+  .blog-grid { max-width: 1150px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+  .blog-card { background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; }
+  .blog-card:hover { transform: translateY(-6px); border-color: var(--cyan); box-shadow: 0 14px 40px rgba(0,229,255,0.14); }
+  .blog-thumb { height: 170px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0a1020, #131a2e); display: flex; align-items: center; justify-content: center; }
+  .blog-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .blog-thumb .thumb-fallback { width: 64px; height: 64px; opacity: 0.5; filter: drop-shadow(0 0 12px rgba(0,229,255,0.4)); }
+  .blog-tag { position: absolute; top: 12px; left: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 1px; color: var(--cyan); padding: 4px 10px; border: 1px solid var(--border); border-radius: 12px; background: rgba(5,7,15,0.7); backdrop-filter: blur(6px); }
+  .blog-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+  .blog-date { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 10px; }
+  .blog-body h3 { font-size: 1.12rem; margin-bottom: 10px; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; line-height: 1.35; }
+  .blog-body p { color: var(--muted); font-size: 0.9rem; flex: 1; margin-bottom: 16px; }
+  .blog-link { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan); text-decoration: none; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; transition: gap 0.2s; }
+  .blog-link:hover { gap: 12px; }
+  .blog-state { text-align: center; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; grid-column: 1 / -1; padding: 30px; }
+  .blog-skeleton { height: 320px; border-radius: 12px; background: linear-gradient(100deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border: 1px solid var(--border); }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* === Terminal === */
+  .terminal-section { max-width: 800px; margin: 70px auto 0; }
+  .terminal { background: #020308; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 229, 255, 0.1); }
+  .terminal-header { background: #0a0e1a; padding: 12px 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+  .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .terminal-dot.red { background: #ff5f57; } .terminal-dot.yellow { background: #febc2e; } .terminal-dot.green { background: #28c840; }
+  .terminal-title { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); }
+  .terminal-body { padding: 28px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.8; min-height: 220px; }
+  .term-line { display: block; }
+  .term-prompt { color: var(--cyan); } .term-cmd { color: var(--text); } .term-output { color: var(--muted); } .term-key { color: var(--primary); }
+  .cursor { display: inline-block; width: 8px; height: 16px; background: var(--cyan); vertical-align: text-bottom; animation: cursor-blink 1s steps(2) infinite; }
+  @keyframes cursor-blink { 50% { opacity: 0; } }
+
+  /* === Social === */
+  .social-buttons { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+  .social-btn { position: relative; display: flex; align-items: center; gap: 14px; padding: 18px 30px; border-radius: 14px; text-decoration: none; min-width: 240px; border: 1px solid var(--border); background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
+  .social-btn .s-ico { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+  .social-btn .s-text { text-align: left; } .social-btn .s-text strong { display: block; font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--text); letter-spacing: 0.5px; }
+  .social-btn .s-text span { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .social-btn.tiktok:hover { transform: translateY(-5px); border-color: var(--cyan); box-shadow: 0 12px 36px rgba(0,229,255,0.25); }
+  .social-btn.tiktok .s-ico { background: linear-gradient(135deg, #00f2ea, #ff0050); }
+  .social-btn.instagram:hover { transform: translateY(-5px); border-color: #e1306c; box-shadow: 0 12px 36px rgba(225,48,108,0.3); }
+  .social-btn.instagram .s-ico { background: linear-gradient(135deg, #f09433, #e6683c 30%, #dc2743 60%, #cc2366 80%, #bc1888); }
+
+  /* === Forms / CTA === */
+  .cta-band { max-width: 1100px; margin: 80px auto 0; background: linear-gradient(135deg, rgba(15,20,36,0.95), rgba(19,26,46,0.7)); border: 1px solid var(--border-gold); border-radius: 16px; padding: 50px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; position: relative; overflow: hidden; }
+  .cta-band::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--primary), var(--cyan), transparent); }
+  .cta-band h2 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 14px; letter-spacing: 1px; }
+  .cta-band p { color: var(--muted); margin-bottom: 0; }
+  .form-grid { display: grid; gap: 14px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .contact-form label, .signup-form label { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  input, textarea, select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 13px 15px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; transition: border-color 0.2s, box-shadow 0.2s; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15); }
+  textarea { min-height: 110px; resize: vertical; }
+  .form-btn { background: linear-gradient(135deg, var(--primary), var(--primary-soft)); color: #05070f; padding: 14px; border: none; border-radius: 6px; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; transition: transform 0.2s, box-shadow 0.2s; width: 100%; }
+  .form-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212, 164, 55, 0.5), 0 0 30px rgba(212, 164, 55, 0.3); }
+  .form-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .contact-form { max-width: 540px; margin: 0 auto; text-align: left; }
+  .form-note { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+
+  /* === Toast === */
+  .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+  .toast { display: flex; align-items: center; gap: 12px; min-width: 280px; max-width: 360px; padding: 14px 18px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 12px 40px rgba(0,0,0,0.5); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; transform: translateX(120%); transition: transform 0.4s cubic-bezier(.2,.8,.2,1); }
+  .toast.show { transform: translateX(0); }
+  .toast.success { border-color: rgba(40,200,64,0.5); }
+  .toast.error { border-color: rgba(255,107,107,0.5); }
+  .toast .t-ico { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 800; }
+  .toast.success .t-ico { background: rgba(40,200,64,0.15); color: var(--success); }
+  .toast.error .t-ico { background: rgba(255,107,107,0.15); color: var(--danger); }
+
+  /* === Footer === */
+  footer { background: var(--bg-2); padding: 40px 6% 30px; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); position: relative; z-index: 2; }
+  footer .brand { justify-content: center; margin-bottom: 16px; }
+  .footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 18px 0; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 1px; transition: color 0.2s; cursor: pointer; }
+  .footer-links a:hover { color: var(--cyan); }
+  footer .footer-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; margin-top: 16px; color: var(--muted); opacity: 0.7; }
+  footer .footer-meta span { color: var(--cyan); }
+
+  /* === Mobile === */
+  @media (max-width: 900px) {
+    .product-hero, .pb-grid, .about-grid, .cta-band { grid-template-columns: 1fr; gap: 36px; }
+    .cta-band { padding: 36px 26px; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { position: fixed; top: 64px; left: 0; right: 0; flex-direction: column; gap: 18px; background: rgba(5,7,15,0.97); backdrop-filter: blur(14px); padding: 24px 6%; border-bottom: 1px solid var(--border); transform: translateY(-130%); transition: transform 0.35s; }
+    .nav-links.open { transform: translateY(0); }
+    .nav-toggle { display: block; }
+    .founders, .field-row { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 60px 1fr; gap: 14px; padding: 20px; }
+    .process-num { font-size: 1.8rem; }
+    .process-status { grid-column: 1 / -1; justify-self: start; }
+    section { padding: 70px 6%; }
+    .hero h1 { letter-spacing: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<canvas id="particles"></canvas>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f5d97f"/><stop offset="100%" stop-color="#b88a1f"/></linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#0099bb"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <symbol id="taseca-logo" viewBox="0 0 200 200">
+      <polygon points="100,15 180,170 20,170" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linejoin="round" filter="url(#glow)"/>
+      <polygon points="100,40 160,158 40,158" fill="none" stroke="#00e5ff" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="3,3"/>
+      <circle cx="100" cy="15" r="3" fill="#00e5ff"/><circle cx="180" cy="170" r="3" fill="#00e5ff"/><circle cx="20" cy="170" r="3" fill="#00e5ff"/>
+      <path d="M 55 105 Q 100 70 145 105 Q 100 140 55 105 Z" fill="#05070f" stroke="url(#goldGrad)" stroke-width="2.5"/>
+      <circle cx="100" cy="105" r="18" fill="url(#goldGrad)"/>
+      <circle cx="100" cy="105" r="13" fill="none" stroke="#05070f" stroke-width="0.8"/>
+      <circle class="eye-pupil" cx="100" cy="105" r="8" fill="#05070f"/>
+      <circle class="eye-pupil" cx="100" cy="105" r="3" fill="#00e5ff"/>
+      <circle cx="104" cy="101" r="2" fill="#f5d97f"/>
+      <line x1="100" y1="80" x2="100" y2="65" stroke="#00e5ff" stroke-width="1.2" stroke-opacity="0.7"/>
+      <line x1="78" y1="95" x2="68" y2="88" stroke="#00e5ff" stroke-width="1.2" stroke-opacity="0.7"/>
+      <line x1="122" y1="95" x2="132" y2="88" stroke="#00e5ff" stroke-width="1.2" stroke-opacity="0.7"/>
+      <rect x="70" y="148" width="8" height="8" fill="#00e5ff" opacity="0.7"/>
+      <rect x="82" y="142" width="8" height="14" fill="url(#goldGrad)" opacity="0.85"/>
+      <rect x="94" y="138" width="8" height="18" fill="url(#goldGrad)"/>
+      <rect x="106" y="144" width="8" height="12" fill="url(#goldGrad)" opacity="0.85"/>
+      <rect x="118" y="140" width="8" height="16" fill="#00e5ff" opacity="0.7"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- Navigation -->
+<nav>
+  <a class="brand" href="#inicio">
+    <svg><use href="#taseca-logo"/></svg>
+    TASECA
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="#inicio">inicio</a>
+    <a href="#producto">producto</a>
+    <a href="#servicios">servicios</a>
+    <a href="#nosotros">nosotros</a>
+    <a href="#blog">blog</a>
+    <a href="#redes">redes</a>
+    <a href="#contacto">contacto</a>
+  </div>
+  <a class="cta" href="#producto">EMPEZAR GRATIS_</a>
+  <button class="nav-toggle" id="navToggle" aria-label="Menú">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
+
+<!-- ===================== PÁGINA: INICIO ===================== -->
+<div class="page active" id="inicio">
+  <section class="hero">
+    <div class="hero-tag"><span class="dot"></span> SISTEMA EN LÍNEA · SAAS + AUTOMATIZACIÓN v3.0</div>
+    <div class="hero-logo-wrap">
+      <div class="ring"></div>
+      <div class="ring ring-2"></div>
+      <svg class="hero-logo"><use href="#taseca-logo"/></svg>
+    </div>
+    <h1>Tu negocio en piloto automático</h1>
+    <div class="tagline"><span class="bracket">&lt;</span> Software · Automatización · Analítica predictiva <span class="bracket">/&gt;</span></div>
+    <p class="lead">Construimos sistemas que <strong style="color: var(--primary-soft);">trabajan por ti 24/7</strong>: agendan citas, envían recordatorios y convierten tus datos en decisiones. Empieza con <strong style="color: var(--primary-soft);">Taseca Citas</strong>, el sistema de agendamiento para barberías, salones y spas.</p>
+    <div class="hero-buttons">
+      <a class="btn-primary" href="#producto">PROBAR GRATIS 14 DÍAS →</a>
+      <a class="btn-secondary" href="#producto">VER DEMO_</a>
+    </div>
+    <div class="hero-ticker">
+      <div>· CITAS GESTIONADAS <span>180K+</span></div>
+      <div>· CANCELACIONES <span>-38%</span></div>
+      <div>· RECORDATORIOS <span>AUTO</span></div>
+      <div>· UPTIME <span>99.98%</span></div>
+    </div>
+  </section>
+  <section class="value-props">
+    <div class="value-props-grid">
+      <div class="value-card reveal"><div class="value-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Agenda <span class="highlight">automática 24/7</span> sin llamadas ni WhatsApp manual</h3></div>
+      <div class="value-card reveal"><div class="value-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Recordatorios que <span class="highlight">reducen las cancelaciones</span></h3></div>
+      <div class="value-card reveal"><div class="value-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3><span class="highlight">Control en tiempo real</span> de tu negocio desde el celular</h3></div>
+      <div class="value-card reveal"><div class="value-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Datos que te dicen <span class="highlight">cómo crecer</span>, no solo números</h3></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== PÁGINA: PRODUCTO ===================== -->
+<div class="page" id="producto">
+  <section>
+    <div class="section-title page-head reveal">
+      <div class="eyebrow">PRODUCTO ESTRELLA</div>
+      <h2>Taseca Citas</h2>
+      <p>El sistema de agendamiento inteligente para barberías, salones y spas. Diseñado para llenar tu agenda y dejar de perder clientes.</p>
+    </div>
+    <div class="product-hero reveal">
+      <div>
+        <div class="product-badge">⚡ SaaS · LISTO PARA USAR</div>
+        <h2>Deja de gestionar citas a mano. <span class="grad">Que el sistema lo haga.</span></h2>
+        <div class="audience-chips"><span class="audience-chip">💈 Barberías</span><span class="audience-chip">💇 Salones</span><span class="audience-chip">💆 Spas</span></div>
+        <p class="intro">Tus clientes reservan solos desde un enlace, reciben recordatorios automáticos y tú ves todo en tiempo real. Menos desorden, menos huecos vacíos y cero citas olvidadas.</p>
+        <div class="product-cta-row">
+          <a class="btn-primary" href="#contacto">QUIERO TASECA CITAS →</a>
+          <a class="btn-secondary" href="#contacto">AGENDAR DEMO_</a>
+        </div>
+      </div>
+      <div class="video-demo">
+        <iframe src="https://www.youtube.com/embed/afkYH4AAQLQ?rel=0&modestbranding=1"
+                title="Demo Taseca Citas" loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div class="pb-grid reveal">
+      <div class="pb-col problems">
+        <h3>⚠ Sin Taseca Citas</h3>
+        <div class="pb-item"><div class="pb-ico">✕</div><div><h4>Desorden en la agenda</h4><p>Citas en cuadernos, chats sueltos y notas que se cruzan. Nadie sabe quién viene ni cuándo.</p></div></div>
+        <div class="pb-item"><div class="pb-ico">✕</div><div><h4>Clientes que se pierden</h4><p>No contestas a tiempo un mensaje y el cliente se va a la competencia. Cada hueco vacío es dinero perdido.</p></div></div>
+        <div class="pb-item"><div class="pb-ico">✕</div><div><h4>Cancelaciones y olvidos</h4><p>El cliente olvida la cita, no avisa, y tu silla queda vacía sin posibilidad de reagendar.</p></div></div>
+        <div class="pb-item"><div class="pb-ico">✕</div><div><h4>Cero visibilidad</h4><p>No sabes qué servicio vende más, qué días flojean ni qué clientes no vuelven.</p></div></div>
+      </div>
+      <div class="pb-col benefits">
+        <h3>✓ Con Taseca Citas</h3>
+        <div class="pb-item"><div class="pb-ico">✓</div><div><h4>Reserva automática 24/7</h4><p>Tus clientes agendan solos desde un enlace, sin que tú muevas un dedo. La agenda se organiza sola.</p></div></div>
+        <div class="pb-item"><div class="pb-ico">✓</div><div><h4>Recordatorios inteligentes</h4><p>Mensajes automáticos antes de cada cita que bajan las inasistencias hasta un 38%.</p></div></div>
+        <div class="pb-item"><div class="pb-ico">✓</div><div><h4>Control en tiempo real</h4><p>Ve tu día completo desde el celular: quién viene, qué servicio y cuánto facturas. Donde estés.</p></div></div>
+        <div class="pb-item"><div class="pb-ico">✓</div><div><h4>Analítica que hace crecer</h4><p>Reportes claros de servicios top, horas pico y clientes frecuentes para tomar mejores decisiones.</p></div></div>
+      </div>
+    </div>
+
+    <div class="terminal-section reveal">
+      <div class="terminal">
+        <div class="terminal-header"><span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span><span class="terminal-title">taseca@citas ~ /analytics</span></div>
+        <div class="terminal-body" id="terminal-body"></div>
+      </div>
+    </div>
+
+    <div class="cta-band reveal">
+      <div>
+        <h2>Empieza gratis hoy</h2>
+        <p>Crea tu cuenta de Taseca Citas y prueba 14 días sin tarjeta. Te ayudamos a configurar tu agenda en minutos. Sin compromisos, cancela cuando quieras.</p>
+      </div>
+      <form class="signup-form form-grid" id="signupForm" novalidate>
+        <div class="field-row">
+          <div><label>// Nombre</label><input type="text" name="nombre" placeholder="Tu nombre" required></div>
+          <div><label>// Negocio</label><input type="text" name="negocio" placeholder="Nombre del local"></div>
+        </div>
+        <div class="field-row">
+          <div><label>// Email</label><input type="email" name="email" placeholder="tu@email.com" required></div>
+          <div><label>// WhatsApp</label><input type="tel" name="telefono" placeholder="+57 300 000 0000"></div>
+        </div>
+        <div><label>// Tipo de negocio</label>
+          <select name="tipo_negocio"><option value="barberia">Barbería</option><option value="salon">Salón de belleza</option><option value="spa">Spa</option><option value="otro">Otro</option></select>
+        </div>
+        <button type="submit" class="form-btn" id="signupBtn">CREAR MI CUENTA GRATIS</button>
+        <p class="form-note">Al registrarte aceptas recibir información de Taseca. Cero spam.</p>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== PÁGINA: SERVICIOS ===================== -->
+<div class="page" id="servicios">
+  <section>
+    <div class="section-title page-head reveal">
+      <div class="eyebrow">SERVICIOS</div>
+      <h2>Tecnología que trabaja por tu negocio</h2>
+      <p>Más allá del agendamiento: construimos las soluciones de software, automatización y datos que tu empresa necesita.</p>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card"><span class="card-id">// 001</span><div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h3>Sistemas de Agendamiento</h3><p>Plataformas SaaS de reservas a medida para servicios, con pagos, recordatorios y panel de control.</p></div>
+      <div class="service-card"><span class="card-id">// 002</span><div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3>Automatización de Procesos</h3><p>Eliminamos tareas repetitivas con flujos automáticos y RPA para que tu equipo se enfoque en lo importante.</p></div>
+      <div class="service-card"><span class="card-id">// 003</span><div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg></div><h3>Analítica Predictiva</h3><p>Modelos de datos que anticipan demanda, churn y oportunidades para que decidas con ventaja.</p></div>
+      <div class="service-card"><span class="card-id">// 004</span><div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg></div><h3>Business Intelligence</h3><p>Dashboards en tiempo real que convierten tus datos dispersos en insights accionables y claros.</p></div>
+      <div class="service-card"><span class="card-id">// 005</span><div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><h3>Recolección de Datos</h3><p>Integramos tus fuentes (CRM, redes, ventas) en un solo lugar limpio, ordenado y listo para analizar.</p></div>
+      <div class="service-card"><span class="card-id">// 006</span><div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><h3>Software a Medida</h3><p>Desarrollamos web apps y herramientas internas escalables, pensadas para crecer contigo.</p></div>
+    </div>
+
+    <div class="section-title reveal" style="margin-top:90px">
+      <div class="eyebrow">// CÓMO TRABAJAMOS</div>
+      <h2>De la idea al sistema funcionando</h2>
+      <p>Una metodología clara en cuatro fases para que veas resultados rápido.</p>
+    </div>
+    <div class="process-list reveal" style="margin-top:0">
+      <div class="process-item"><div class="process-num">01</div><div><h4>DIAGNÓSTICO</h4><p>Entendemos tu negocio, tus cuellos de botella y qué tareas te roban tiempo y clientes.</p></div><div class="process-status">ACTIVE</div></div>
+      <div class="process-item"><div class="process-num">02</div><div><h4>DISEÑO</h4><p>Diseñamos la solución: agendamiento, automatización o analítica adaptada a ti.</p></div><div class="process-status">ACTIVE</div></div>
+      <div class="process-item"><div class="process-num">03</div><div><h4>IMPLEMENTACIÓN</h4><p>Lo ponemos en marcha rápido, fácil de usar y conectado a tus herramientas.</p></div><div class="process-status">ACTIVE</div></div>
+      <div class="process-item"><div class="process-num">04</div><div><h4>OPTIMIZACIÓN</h4><p>Medimos, ajustamos y te acompañamos para que el sistema siga mejorando.</p></div><div class="process-status">ACTIVE</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== PÁGINA: NOSOTROS ===================== -->
+<div class="page" id="nosotros">
+  <section>
+    <div class="about-grid" style="padding-top:90px">
+      <div class="about-text reveal">
+        <div class="eyebrow">// SOBRE NOSOTROS</div>
+        <h2>Dos jóvenes obsesionados con que la tecnología trabaje por ti</h2>
+        <p>Somos <strong>dos jóvenes especialistas</strong> en soluciones tecnológicas, automatización, recolección de datos y analítica predictiva. Fundamos Taseca con una idea simple: que cualquier negocio —desde una barbería de barrio hasta una empresa en crecimiento— pueda tomar decisiones con la misma inteligencia que las grandes compañías.</p>
+        <p>No vendemos humo ni reportes que nadie lee. Construimos <strong>sistemas que funcionan solos</strong>, que se entienden y que dan resultados medibles. Cercanos en el trato, exigentes con la calidad.</p>
+        <div class="founders">
+          <div class="founder"><div class="founder-avatar"><img src="fundador-1.jpg" alt="Andrés" onerror="this.replaceWith(document.createTextNode('A'))"></div><h4>Andrés</h4><span>AUTOMATIZACIÓN & SOFTWARE</span></div>
+          <div class="founder"><div class="founder-avatar"><img src="fundador-2.jpg" alt="Socio Taseca" onerror="this.replaceWith(document.createTextNode('T'))"></div><h4>Socio Taseca</h4><span>DATOS & ANALÍTICA</span></div>
+        </div>
+        <div class="stats">
+          <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">ENFOCADOS_EN_TI</div></div>
+          <div class="stat-box"><div class="stat-num">24/7</div><div class="stat-label">AUTOMATIZACIÓN</div></div>
+          <div class="stat-box"><div class="stat-num">&lt;24h</div><div class="stat-label">RESPUESTA</div></div>
+          <div class="stat-box"><div class="stat-num">∞</div><div class="stat-label">ESCALABLE</div></div>
+        </div>
+      </div>
+      <div class="about-visual reveal">
+        <div class="hud-frame"><span class="corner bl"></span><span class="corner br"></span><svg class="logo-large" viewBox="0 0 200 200"><use href="#taseca-logo"/></svg></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== PÁGINA: BLOG ===================== -->
+<div class="page" id="blog">
+  <section>
+    <div class="section-title page-head reveal">
+      <div class="eyebrow">// BLOG</div>
+      <h2>Ideas para hacer crecer tu negocio</h2>
+      <p>Estrategias de agendamiento, automatización y marketing. Contenido nuevo cada mes.</p>
+    </div>
+    <div class="blog-grid" id="blogGrid">
+      <div class="blog-skeleton"></div><div class="blog-skeleton"></div><div class="blog-skeleton"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== PÁGINA: REDES ===================== -->
+<div class="page" id="redes">
+  <section style="text-align:center">
+    <div class="section-title page-head reveal">
+      <div class="eyebrow">// COMUNIDAD</div>
+      <h2>Síguenos en redes</h2>
+      <p>Tips, demos y casos reales. Únete a la comunidad Taseca.</p>
+    </div>
+    <div class="social-buttons reveal">
+      <a href="https://www.tiktok.com/@taseca.tech" target="_blank" rel="noopener" class="social-btn tiktok">
+        <span class="s-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg></span>
+        <span class="s-text"><strong>TikTok</strong><span>@taseca.tech</span></span>
+      </a>
+      <a href="https://www.instagram.com/taseca.tech/" target="_blank" rel="noopener" class="social-btn instagram">
+        <span class="s-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
+        <span class="s-text"><strong>Instagram</strong><span>@taseca.tech</span></span>
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== PÁGINA: CONTACTO ===================== -->
+<div class="page" id="contacto">
+  <section style="text-align:center">
+    <div class="section-title page-head reveal">
+      <div class="eyebrow">// CONTACTO</div>
+      <h2>¿Hablamos de tu proyecto?</h2>
+      <p>Cuéntanos qué necesitas y te respondemos en menos de 24 horas.</p>
+    </div>
+    <form class="contact-form form-grid reveal" id="contactForm" novalidate>
+      <div><label>// Nombre completo</label><input type="text" name="nombre" placeholder="Tu nombre" required></div>
+      <div><label>// Email</label><input type="email" name="email" placeholder="tu@email.com" required></div>
+      <div><label>// Empresa / Negocio</label><input type="text" name="empresa" placeholder="Nombre de tu empresa"></div>
+      <div><label>// Mensaje</label><textarea name="mensaje" placeholder="Cuéntanos sobre tu proyecto..." required></textarea></div>
+      <button type="submit" class="form-btn" id="contactBtn">TRANSMITIR_</button>
+    </form>
+  </section>
+</div>
+
+<!-- Footer -->
+<footer>
+  <a class="brand" href="#inicio"><svg><use href="#taseca-logo"/></svg> TASECA</a>
+  <p>Software · Automatización · Analítica predictiva</p>
+  <div class="footer-links">
+    <a href="#producto">Producto</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#blog">Blog</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+  <p class="footer-meta"><span>[</span> © 2026 TASECA · ALL RIGHTS RESERVED <span>]</span></p>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  /* ===== CONFIGURACIÓN — edita solo este bloque ===== */
+  const CONFIG = {
+    SUPABASE_URL: 'https://gckssepifcqxozbsxfsd.supabase.co',
+    SUPABASE_ANON_KEY: 'sb_publishable_xtFAK7C-8p5GGbBb-evdiA_gys88PVh',
+    TABLES: { leads: 'leads', contactos: 'contactos', registros: 'registros', blog: 'blog_posts' }
+  };
+
+  /* ===== Conexión Supabase vía REST (sin librerías externas) ===== */
+  const supaReady = CONFIG.SUPABASE_URL.indexOf('TU-PROYECTO') === -1 && CONFIG.SUPABASE_ANON_KEY !== 'TU_ANON_KEY';
+  const REST = CONFIG.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/';
+  const SUPA_HEADERS = {
+    'apikey': CONFIG.SUPABASE_ANON_KEY,
+    'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+
+  /* ===== Navegación (la paginación la hace el CSS con :target) ===== */
+  function setActiveLink() {
+    const id = location.hash || '#inicio';
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === id));
+  }
+  window.addEventListener('hashchange', () => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    const nl = document.getElementById('navLinks'); if (nl) nl.classList.remove('open');
+    setActiveLink();
+    if (location.hash === '#producto') startTerminalOnce();
+  });
+  setActiveLink();
+  let _termStarted = false;
+  function startTerminalOnce() { if (!_termStarted) { _termStarted = true; startTerminal(); } }
+  if (location.hash === '#producto') startTerminalOnce();
+
+  /* ===== Toasts ===== */
+  function toast(msg, type = 'success') {
+    const wrap = document.getElementById('toastWrap');
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.innerHTML = '<span class="t-ico">' + (type === 'success' ? '✓' : '!') + '</span><span>' + msg + '</span>';
+    wrap.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 4500);
+  }
+
+  /* ===== Inserción (POST a la API REST de Supabase) ===== */
+  async function insertRow(table, payload) {
+    if (!supaReady) { console.warn('[Taseca] Supabase no configurado.'); await new Promise(r => setTimeout(r, 500)); return { ok: true, simulated: true }; }
+    try {
+      const res = await fetch(REST + table, { method: 'POST', headers: SUPA_HEADERS, body: JSON.stringify(payload) });
+      if (!res.ok) { const t = await res.text(); console.error('[Taseca] Error insert', res.status, t); return { ok: false, error: t }; }
+      return { ok: true };
+    } catch (e) { console.error('[Taseca] Error de red:', e); return { ok: false, error: e }; }
+  }
+
+  /* ===== Formularios ===== */
+  function handleForm(formId, btnId, table, mapper, successMsg) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById(btnId);
+      const original = btn.textContent;
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      btn.disabled = true; btn.textContent = 'ENVIANDO...';
+      const data = Object.fromEntries(new FormData(form).entries());
+      const res = await insertRow(table, mapper(data));
+      btn.disabled = false; btn.textContent = original;
+      if (res.ok) { form.reset(); toast(successMsg, 'success'); }
+      else { toast('No se pudo enviar. Intenta de nuevo o escríbenos directo.', 'error'); }
+    });
+  }
+  handleForm('signupForm', 'signupBtn', CONFIG.TABLES.registros,
+    d => ({ nombre: d.nombre, negocio: d.negocio || null, email: d.email, telefono: d.telefono || null, tipo_negocio: d.tipo_negocio, origen: 'landing_registro', creado_en: new Date().toISOString() }),
+    '¡Cuenta creada! Te escribiremos para activar tu prueba gratis.');
+  handleForm('contactForm', 'contactBtn', CONFIG.TABLES.contactos,
+    d => ({ nombre: d.nombre, email: d.email, empresa: d.empresa || null, mensaje: d.mensaje, origen: 'landing_contacto', creado_en: new Date().toISOString() }),
+    'Mensaje enviado. Te contactamos en menos de 24 horas.');
+
+  /* ===== Blog ===== */
+  const FALLBACK_POSTS = [
+    { titulo: '5 formas en que un sistema de citas llena tu agenda', categoria: 'Agendamiento', resumen: 'Descubre cómo automatizar reservas convierte huecos vacíos en ingresos constantes.', fecha: '2026-06-01', url: '#', imagen: null },
+    { titulo: 'Por qué pierdes clientes (y cómo recuperarlos)', categoria: 'Crecimiento', resumen: 'El 40% de los clientes no vuelve por mala experiencia de reserva. Te mostramos cómo evitarlo.', fecha: '2026-05-15', url: '#', imagen: null },
+    { titulo: 'Recordatorios automáticos: -38% de cancelaciones', categoria: 'Automatización', resumen: 'Un mensaje en el momento correcto cambia todo. Aquí los datos detrás del recordatorio perfecto.', fecha: '2026-05-02', url: '#', imagen: null }
+  ];
+  function fmtDate(d) { try { return new Date(d).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase(); } catch (e) { return d; } }
+  function renderBlog(posts) {
+    const grid = document.getElementById('blogGrid');
+    if (!posts || !posts.length) { grid.innerHTML = '<div class="blog-state">Pronto publicaremos contenido nuevo. Vuelve en unos días.</div>'; return; }
+    grid.innerHTML = posts.map(p => `
+      <article class="blog-card">
+        <div class="blog-thumb">${p.imagen ? `<img src="${p.imagen}" alt="${p.titulo}" loading="lazy">` : `<svg class="thumb-fallback" viewBox="0 0 200 200"><use href="#taseca-logo"/></svg>`}<span class="blog-tag">${p.categoria || 'TASECA'}</span></div>
+        <div class="blog-body"><div class="blog-date">${fmtDate(p.fecha)}</div><h3>${p.titulo}</h3><p>${p.resumen || ''}</p><a class="blog-link" href="${p.url || '#'}" ${p.url && p.url !== '#' ? 'target="_blank" rel="noopener"' : ''}>LEER MÁS →</a></div>
+      </article>`).join('');
+  }
+  async function loadBlog() {
+    if (!supaReady) { renderBlog(FALLBACK_POSTS); return; }
+    try {
+      const q = '?select=titulo,categoria,resumen,fecha,url,imagen&publicado=eq.true&order=fecha.desc&limit=6';
+      const res = await fetch(REST + CONFIG.TABLES.blog + q, { headers: SUPA_HEADERS });
+      if (!res.ok) { renderBlog(FALLBACK_POSTS); return; }
+      const data = await res.json();
+      renderBlog(data && data.length ? data : FALLBACK_POSTS);
+    } catch (e) { renderBlog(FALLBACK_POSTS); }
+  }
+  loadBlog();
+
+  /* ===== Video overlay ===== */
+  (function() {
+    const overlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('demoVideo');
+    if (!overlay || !video) return;
+    overlay.addEventListener('click', () => { overlay.classList.add('hidden'); const p = video.play(); if (p && p.catch) p.catch(() => {}); });
+    video.addEventListener('pause', () => { if (video.currentTime === 0) overlay.classList.remove('hidden'); });
+  })();
+
+  /* ===== Mobile nav ===== */
+  (function() {
+    const toggle = document.getElementById('navToggle');
+    const links = document.getElementById('navLinks');
+    if (toggle) toggle.addEventListener('click', () => links.classList.toggle('open'));
+  })();
+
+  /* ===== Particles ===== */
+  (function() {
+    const canvas = document.getElementById('particles'); const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    const N = Math.min(60, Math.floor((window.innerWidth * window.innerHeight) / 30000));
+    for (let i = 0; i < N; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3, r: Math.random()*1.5+0.5, color: Math.random()>0.6 ? 'rgba(212, 164, 55, ' : 'rgba(0, 229, 255, ' });
+    function animate() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>canvas.width)p.vx*=-1; if(p.y<0||p.y>canvas.height)p.vy*=-1; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=p.color+'0.6)'; ctx.fill(); });
+      for (let i=0;i<particles.length;i++) for (let j=i+1;j<particles.length;j++) { const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy); if(dist<130){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(0, 229, 255, ${0.15*(1-dist/130)})`; ctx.lineWidth=0.5; ctx.stroke(); } }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+
+  /* ===== Terminal ===== */
+  function startTerminal() {
+    const termBody = document.getElementById('terminal-body');
+    if (!termBody) return;
+    const lines = [
+      { type: 'prompt', text: 'taseca@citas:~$ ', cmd: 'analyze --negocio="barberia-luxe" --periodo=mes' },
+      { type: 'output', text: '> Conectando a fuentes de datos...' },
+      { type: 'output', text: '> [✓] Reservas · [✓] Clientes · [✓] Pagos · [✓] Recordatorios' },
+      { type: 'output', text: '> Procesando 4,182 citas...' },
+      { type: 'output', text: '> Ejecutando modelos predictivos...' },
+      { type: 'key', text: '' },
+      { type: 'key', text: '┌─ INSIGHTS DETECTADOS ────────────────────┐' },
+      { type: 'key', text: '│ ▸ Inasistencias: 8.1% (-38% con recordat.)│' },
+      { type: 'key', text: '│ ▸ Hora pico: Vie 17-20h (llena al 96%)    │' },
+      { type: 'key', text: '│ ▸ Oportunidad: +$1.4M reactivando clientes│' },
+      { type: 'key', text: '└──────────────────────────────────────────┘' },
+      { type: 'prompt', text: 'taseca@citas:~$ ', cmd: '', cursor: true }
+    ];
+    let lineIdx = 0, charIdx = 0;
+    function typeNext() {
+      if (lineIdx >= lines.length) { setTimeout(() => { termBody.innerHTML = ''; lineIdx = 0; charIdx = 0; typeNext(); }, 5000); return; }
+      const line = lines[lineIdx];
+      let div = termBody.querySelector(`.term-line[data-idx="${lineIdx}"]`);
+      if (!div) {
+        div = document.createElement('span'); div.className = 'term-line'; div.dataset.idx = lineIdx; termBody.appendChild(div);
+        if (line.type === 'prompt') {
+          const p = document.createElement('span'); p.className = 'term-prompt'; p.textContent = line.text; div.appendChild(p);
+          const c = document.createElement('span'); c.className = 'term-cmd'; div.appendChild(c);
+          if (line.cursor) { const cur = document.createElement('span'); cur.className = 'cursor'; div.appendChild(cur); }
+        } else if (line.type === 'output') { div.className += ' term-output'; } else if (line.type === 'key') { div.className += ' term-key'; }
+      }
+      const target = line.cmd !== undefined ? line.cmd : line.text;
+      if (charIdx < target.length) {
+        if (line.type === 'prompt') { div.querySelector('.term-cmd').textContent = target.substring(0, charIdx + 1); } else { div.textContent = target.substring(0, charIdx + 1); }
+        charIdx++; setTimeout(typeNext, line.type === 'prompt' ? 40 : 15);
+      } else { lineIdx++; charIdx = 0; setTimeout(typeNext, line.type === 'output' ? 250 : 100); }
+    }
+    typeNext();
+  }
+</script>
+
+</body>
+</html>
