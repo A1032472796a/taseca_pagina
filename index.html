@@ -661,7 +661,7 @@
     grid.innerHTML = posts.map(p => `
       <article class="blog-card">
         <div class="blog-thumb">${p.imagen ? `<img src="${p.imagen}" alt="${p.titulo}" loading="lazy">` : `<svg class="thumb-fallback" viewBox="0 0 200 200"><use href="#taseca-logo"/></svg>`}<span class="blog-tag">${p.categoria || 'TASECA'}</span></div>
-        <div class="blog-body"><div class="blog-date">${fmtDate(p.fecha)}</div><h3>${p.titulo}</h3><p>${p.resumen || ''}</p><a class="blog-link" href="${p.url || '#'}" ${p.url && p.url !== '#' ? 'target="_blank" rel="noopener"' : ''}>LEER MÁS →</a></div>
+        <div class="blog-body"><div class="blog-date">${fmtDate(p.fecha)}</div><h3>${p.titulo}</h3><p>${p.resumen || ''}</p><a class="blog-link" href="${p.url && p.url !== '#' ? p.url : 'javascript:void(0)'}" ${p.url && p.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : ''}>LEER MÁS →</a></div>
       </article>`).join('');
   }
   async function loadBlog() {
